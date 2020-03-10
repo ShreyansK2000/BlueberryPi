@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/bluetooth_tab"
+        android:icon="@drawable/ic_bluetooth_black_24dp"
+        android:title="@string/menu_connect"/>
+
+    <item
+        android:id="@+id/devices_tab"
+        android:icon="@drawable/ic_devices_black_24dp"
+        android:title="@string/menu_devices"/>
+
+    <item
+        android:id="@+id/rpi_tab"
+        android:icon="@drawable/ic_screen_rpi_black_24dp"
+        android:title="@string/menu_rpi"/>
+
+</menu>
