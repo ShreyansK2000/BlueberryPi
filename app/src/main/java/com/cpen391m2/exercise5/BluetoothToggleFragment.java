@@ -1,7 +1,6 @@
 package com.cpen391m2.exercise5;
 
 import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -22,13 +21,20 @@ import androidx.fragment.app.Fragment;
 public class BluetoothToggleFragment extends Fragment {
 
     private Context context;
-    private TextView status_tv;
     private ImageView status_iv;
+    private TextView bluetooth_status_tv;
     private Button toggle_button;
+
+    private TextView discoverable_status_tv;
+    private Button discoverable_button;
+
     private String stateString;
+    private String modeString;
+
     public int enabled;
     private BluetoothAdapter mBluetoothAdapter;
-    private final BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
+
+    private final BroadcastReceiver mBroadcastReceiverState = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
@@ -63,7 +69,32 @@ public class BluetoothToggleFragment extends Fragment {
 
                     case BluetoothAdapter.STATE_CONNECTING:
                         enabled = 2;
-                        stateString = "Connecting to device";
+                        stateString = "Connecting to device...";
+                        break;
+                }
+                setValues();
+            }
+        }
+    };
+
+    private final BroadcastReceiver mBroadcastReceiverMode = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            if (mBluetoothAdapter.ACTION_SCAN_MODE_CHANGED.equals(action)) {
+                int state = intent.getIntExtra(BluetoothAdapter.EXTRA_SCAN_MODE, mBluetoothAdapter.ERROR);
+
+                switch (state) {
+                    case BluetoothAdapter.SCAN_MODE_CONNECTABLE:
+                        modeString = "Device is not discoverable, can receive connections";
+                        break;
+
+                    case BluetoothAdapter.SCAN_MODE_CONNECTABLE_DISCOVERABLE:
+                        modeString = "Device is discoverable, can receive connections";
+                        break;
+
+                    case BluetoothAdapter.SCAN_MODE_NONE:
+                        modeString = "Not discoverable, cannot receive connection";
                         break;
                 }
                 setValues();
@@ -75,8 +106,9 @@ public class BluetoothToggleFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.context = getContext().getApplicationContext();
-        this.enabled = 0;
         this.mBluetoothAdapter = MainActivity.getBluetoothAdapterInstance();
+        this.stateString = "";
+        this.modeString = "";
     }
 
     @Nullable
@@ -84,13 +116,16 @@ public class BluetoothToggleFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         final View view = inflater.inflate(R.layout.fragement_bluetooth, container, false);
 
-        status_tv = view.findViewById(R.id.bluetooth_status_text);
-        status_tv.setTextColor(getResources().getColor(R.color.white));
+        bluetooth_status_tv = view.findViewById(R.id.bluetooth_status_text);
+        bluetooth_status_tv.setTextColor(getResources().getColor(R.color.white));
 
         status_iv = view.findViewById(R.id.bluetooth_status_image);
         toggle_button = view.findViewById(R.id.bluetooth_toggle_button);
+        discoverable_status_tv = view.findViewById(R.id.discoverable_status_text);
+        discoverable_button = view.findViewById(R.id.discoverable_button);
 
         toggle_button.setOnClickListener(toggleListener);
+        discoverable_button.setOnClickListener(discoverableListener);
 
         setValues();
 
@@ -98,27 +133,49 @@ public class BluetoothToggleFragment extends Fragment {
     }
 
 
-    private void setValues() {
+    void setValues() {
         if (enabled == 0) {
             toggle_button.setText("ENABLE BLUETOOTH");
             status_iv.setImageDrawable(context.getDrawable(R.drawable.ic_bluetooth_disabled_black_24dp));
+            discoverable_status_tv.setVisibility(View.GONE);
+            discoverable_button.setVisibility(View.GONE);
+
+            System.out.println(bluetooth_status_tv.getText());
+
+            if (stateString.equals("")){
+                bluetooth_status_tv.setText("Bluetooth is off");
+            } else {
+                bluetooth_status_tv.setText(stateString);
+            }
+
         } else {
             toggle_button.setText("DISABLE BLUETOOTH");
+
+            discoverable_status_tv.setVisibility(View.VISIBLE);
+            discoverable_status_tv.setText(modeString);
+            discoverable_button.setVisibility(View.VISIBLE);
+            discoverable_button.setText("MAKE DISCOVERABLE");
 
             if (enabled == 1) {
                 status_iv.setImageDrawable(context.getDrawable(R.drawable.ic_bluetooth_black_24dp));
             } else if (enabled == 2) {
                 status_iv.setImageDrawable(context.getDrawable(R.drawable.ic_bluetooth_connected_black_24dp));
             }
+
+            if (stateString.equals("")){
+                bluetooth_status_tv.setText("Bluetooth is on");
+            } else {
+                bluetooth_status_tv.setText(stateString);
+            }
         }
 
-        status_tv.setText(stateString);
+
     }
 
     private Button.OnClickListener toggleListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
-            if (status_iv != null && status_tv != null) {
+            if (status_iv != null && bluetooth_status_tv != null) {
                 if (mBluetoothAdapter == null) {
                     Toast.makeText(context, "Something went terribly wrong. Adapter should not be null", Toast.LENGTH_LONG).show();
                 }
@@ -127,21 +184,34 @@ public class BluetoothToggleFragment extends Fragment {
                     startActivity(BTEnableIntent);
 
                     IntentFilter BTIntent = new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED);
-                    getActivity().registerReceiver(mBroadcastReceiver, BTIntent);
+                    getActivity().registerReceiver(mBroadcastReceiverState, BTIntent);
 
                 } else if (mBluetoothAdapter.isEnabled()) {
                     mBluetoothAdapter.disable();
 
                     IntentFilter BTIntent = new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED);
-                    getActivity().registerReceiver(mBroadcastReceiver, BTIntent);
+                    getActivity().registerReceiver(mBroadcastReceiverState, BTIntent);
                 }
             }
+        }
+    };
+
+    private Button.OnClickListener discoverableListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            Intent discoverableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
+            discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 300);
+            startActivity(discoverableIntent);
+
+            IntentFilter modeFilter = new IntentFilter(BluetoothAdapter.ACTION_SCAN_MODE_CHANGED);
+            getActivity().registerReceiver(mBroadcastReceiverMode, modeFilter);
         }
     };
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        getActivity().unregisterReceiver(mBroadcastReceiver);
+        getActivity().unregisterReceiver(mBroadcastReceiverState);
+        getActivity().unregisterReceiver(mBroadcastReceiverMode);
     }
 }

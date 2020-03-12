@@ -3,8 +3,12 @@
     <string name="menu_rpi">Raspberry Pi</string>
     <string name="menu_connect">Bluetooth</string>
     <string name="menu_devices">Devices</string>
+    <string name="status_paired">paired</string>
+    <string name="status_not_paired">not_paired</string>
     <string name="status_disconnected">disconnected</string>
     <string name="status_connected">connected</string>
+    <string name="action_pair">PAIR</string>
+    <string name="action_unpair">UNPAIR</string>
     <string name="action_disconnect">DISCONNECT</string>
     <string name="action_connect">CONNECT</string>
 </resources>

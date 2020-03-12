@@ -4,8 +4,9 @@ public class BluetoothCardInfo {
     String device_name;
     String addr;
 
+
     BluetoothCardInfo(String device_name, String addr) {
-        this.device_name = device_name;
+        this.device_name = (device_name == null) ? "NO_NAME" : device_name;
         this.addr = addr;
     }
 

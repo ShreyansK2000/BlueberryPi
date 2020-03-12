@@ -18,11 +18,36 @@ public class BluetoothListAdapter extends RecyclerView.Adapter<BluetoothListAdap
     private String cardType;
     private Context context;
     private List<BluetoothCardInfo> device_list;
+    private BluetoothDiscoverFragment discoverFragment;
+    private BluetoothPairedFragment pairedFragment;
+    private int type;
+
+    public BluetoothListAdapter(Context context, List<BluetoothCardInfo> device_list, String type,
+                                BluetoothDiscoverFragment discoverFragment) {
+        this.context = context;
+        this.cardType = type;
+        this.device_list = device_list;
+        this.discoverFragment = discoverFragment;
+        this.pairedFragment = null;
+        this.type = 2;
+    }
+
+    public BluetoothListAdapter(Context context, List<BluetoothCardInfo> device_list, String type,
+                                BluetoothPairedFragment pairedFragment) {
+        this.context = context;
+        this.cardType = type;
+        this.device_list = device_list;
+        this.pairedFragment = pairedFragment;
+        this.discoverFragment = null;
+        this.type = 1;
+    }
+
 
     public BluetoothListAdapter(Context context, List<BluetoothCardInfo> device_list, String type) {
         this.context = context;
         this.cardType = type;
         this.device_list = device_list;
+        this.type = 0;
     }
 
 
@@ -38,12 +63,12 @@ public class BluetoothListAdapter extends RecyclerView.Adapter<BluetoothListAdap
     public void onBindViewHolder(@NonNull final BluetoothInfoHolder holder, int position) {
         final BluetoothCardInfo device_info = device_list.get(position);
 
-        String buttonText = cardType.equals(context.getString(R.string.status_disconnected)) ?
-                            context.getString(R.string.action_connect) : context.getString(R.string.action_disconnect);
+        String buttonText = cardType.equals(context.getString(R.string.status_not_paired)) ?
+                            context.getString(R.string.action_pair) : context.getString(R.string.action_unpair);
 
         holder.device_name_tv.setText(device_info.getDeviceName());
         holder.device_addr_tv.setText(device_info.getAddr());
-        holder.connectButton.setText(buttonText);
+        holder.pair_button.setText(buttonText);
 
     }
 
@@ -56,22 +81,35 @@ public class BluetoothListAdapter extends RecyclerView.Adapter<BluetoothListAdap
 
         private TextView device_name_tv;
         private TextView device_addr_tv;
-        private Button connectButton;
+        private Button pair_button;
         private View holderView;
 
         public BluetoothInfoHolder(@NonNull View itemView) {
             super(itemView);
             device_name_tv = itemView.findViewById(R.id.device_name);
             device_addr_tv = itemView.findViewById(R.id.device_addr);
-            connectButton = itemView.findViewById(R.id.connect_button);
+            pair_button = itemView.findViewById(R.id.connect_button);
             holderView = itemView;
 
-            connectButton.setOnClickListener(new View.OnClickListener() {
+            pair_button.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     if (cardType.equals(context.getString(R.string.status_disconnected))) {
                         // discover/paired device connect button
-                        Toast.makeText(context, "Disconnected device, attempting to connect", Toast.LENGTH_LONG).show();
+                        boolean success = (type == 2) ? discoverFragment.pairDevice(getAdapterPosition()):
+                                                        pairedFragment.unPairDevice(getAdapterPosition());
+                        if (success) {
+                            if (type == 2) {
+                                Toast.makeText(context, "Attempting to pair", Toast.LENGTH_SHORT).show();
+                            } else if (type == 1) {
+                                Toast.makeText(context, "Successfully unpaired", Toast.LENGTH_SHORT).show();
+                                pair_button.setClickable(false);
+                            }
+
+                        } else {
+                            Toast.makeText(context, "Could not perform operation", Toast.LENGTH_SHORT).show();
+                        }
+
 
                     } else if (cardType.equals(context.getString(R.string.status_connected))) {
                         // connected device disconnect button
