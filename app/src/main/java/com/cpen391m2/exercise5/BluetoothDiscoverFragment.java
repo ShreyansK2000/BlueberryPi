@@ -83,6 +83,9 @@ public class BluetoothDiscoverFragment extends Fragment {
                     Toast.makeText(getActivity(),
                             "Bonding Successful. Device Paired. Please refresh paired devices",
                             Toast.LENGTH_SHORT).show();
+                    if (mDevice.getName().equals("raspberrypi")) {
+                        MainActivity.rpiDevice = mDevice;
+                    }
                 }
                 //case2: creating a bone
                 if (mDevice.getBondState() == BluetoothDevice.BOND_BONDING) {
@@ -133,7 +136,7 @@ public class BluetoothDiscoverFragment extends Fragment {
         recyclerView = view.findViewById(R.id.device_list_recycler);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
-        adapter = new BluetoothListAdapter(context, discovered_devices, context.getString(R.string.status_not_paired), this);
+        adapter = new BluetoothListAdapter(context, discovered_devices, context.getString(R.string.status_disconnected), this);
         recyclerView.setAdapter(adapter);
 
         return view;

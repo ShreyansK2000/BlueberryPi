@@ -58,13 +58,19 @@ public class BluetoothPairedFragment extends Fragment {// implements SwipeRefres
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
 
-        adapter = new BluetoothListAdapter(context, paired_devices, context.getString(R.string.status_paired), this);
+        adapter = new BluetoothListAdapter(context, paired_devices, context.getString(R.string.status_disconnected), this);
         recyclerView.setAdapter(adapter);
 
         refreshButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 getPairedDevicesList();
+                for (BluetoothDevice bluetoothDevice : devices_list) {
+                    if (bluetoothDevice.getName().equals("raspberrypi")) {
+                        MainActivity.rpiDevice = bluetoothDevice;
+                        break;
+                    }
+                }
             }
         });
 

@@ -63,7 +63,7 @@ public class BluetoothListAdapter extends RecyclerView.Adapter<BluetoothListAdap
     public void onBindViewHolder(@NonNull final BluetoothInfoHolder holder, int position) {
         final BluetoothCardInfo device_info = device_list.get(position);
 
-        String buttonText = cardType.equals(context.getString(R.string.status_not_paired)) ?
+        String buttonText = type == 2 ?
                             context.getString(R.string.action_pair) : context.getString(R.string.action_unpair);
 
         holder.device_name_tv.setText(device_info.getDeviceName());

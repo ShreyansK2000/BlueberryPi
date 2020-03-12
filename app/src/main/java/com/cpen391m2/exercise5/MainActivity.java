@@ -6,6 +6,8 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
 import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
+import android.content.Context;
 import android.os.Bundle;
 import android.view.MenuItem;
 
@@ -24,12 +26,23 @@ public class MainActivity extends AppCompatActivity {
     protected static BluetoothAdapter staticBluetoothAdapter;
     private BluetoothAdapter mBlueToothAdapter;
 
+    public static BluetoothConnectionService connectionService;
+    public static BluetoothDevice rpiDevice;
+
     public static BluetoothAdapter getBluetoothAdapterInstance() {
         if (staticBluetoothAdapter == null) {
             staticBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
             return staticBluetoothAdapter;
         }
         else return staticBluetoothAdapter;
+    }
+
+    public static BluetoothConnectionService getConnectionService(Context context) {
+        if (connectionService == null) {
+            connectionService = new BluetoothConnectionService(context.getApplicationContext());
+            return connectionService;
+        }
+        else return connectionService;
     }
 
 
@@ -40,7 +53,15 @@ public class MainActivity extends AppCompatActivity {
         toggleFragment = new BluetoothToggleFragment();
         devicesFragment = new DevicesFragment();
         rPiControlFragment = new RPiControlFragment();
+
+        connectionService = getConnectionService(this);
+        if (connectionService.getState() == BluetoothConnectionService.STATE_NONE) {
+            connectionService.start();
+        }
+
         FragmentManager fm = getSupportFragmentManager();
+
+        rpiDevice = null;
 
         // set the default symbol
         mBlueToothAdapter = getBluetoothAdapterInstance();
@@ -48,6 +69,11 @@ public class MainActivity extends AppCompatActivity {
             toggleFragment.enabled = 0;
         } else {
             toggleFragment.enabled = 1;
+        }
+
+        connectionService = getConnectionService(this);
+        if (connectionService.getState() == BluetoothConnectionService.STATE_NONE) {
+            connectionService.start();
         }
 
         fm.beginTransaction().add(R.id.fragment_container, devicesFragment, "devices").hide(devicesFragment).commit();
