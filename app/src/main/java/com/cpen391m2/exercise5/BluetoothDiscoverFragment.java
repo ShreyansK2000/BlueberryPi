@@ -143,6 +143,7 @@ public class BluetoothDiscoverFragment extends Fragment {
     }
 
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     public void search() {
         device_list.clear();
         discovered_devices.clear();
