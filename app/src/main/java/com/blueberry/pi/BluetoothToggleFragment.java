@@ -18,6 +18,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import java.util.Objects;
+
 public class BluetoothToggleFragment extends Fragment {
 
     private Context context;
@@ -38,8 +40,8 @@ public class BluetoothToggleFragment extends Fragment {
         @Override
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
-            if (mBluetoothAdapter.ACTION_STATE_CHANGED.equals(action)) {
-                int state = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, mBluetoothAdapter.ERROR);
+            if (BluetoothAdapter.ACTION_STATE_CHANGED.equals(action)) {
+                int state = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, BluetoothAdapter.ERROR);
 
                 switch (state) {
                     case BluetoothAdapter.STATE_OFF:
@@ -81,8 +83,8 @@ public class BluetoothToggleFragment extends Fragment {
         @Override
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
-            if (mBluetoothAdapter.ACTION_SCAN_MODE_CHANGED.equals(action)) {
-                int state = intent.getIntExtra(BluetoothAdapter.EXTRA_SCAN_MODE, mBluetoothAdapter.ERROR);
+            if (BluetoothAdapter.ACTION_SCAN_MODE_CHANGED.equals(action)) {
+                int state = intent.getIntExtra(BluetoothAdapter.EXTRA_SCAN_MODE, BluetoothAdapter.ERROR);
 
                 switch (state) {
                     case BluetoothAdapter.SCAN_MODE_CONNECTABLE:
@@ -184,13 +186,13 @@ public class BluetoothToggleFragment extends Fragment {
                     startActivity(BTEnableIntent);
 
                     IntentFilter BTIntent = new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED);
-                    getActivity().registerReceiver(mBroadcastReceiverState, BTIntent);
+                    Objects.requireNonNull(getActivity()).registerReceiver(mBroadcastReceiverState, BTIntent);
 
-                } else if (mBluetoothAdapter.isEnabled()) {
+                } else {
                     mBluetoothAdapter.disable();
 
                     IntentFilter BTIntent = new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED);
-                    getActivity().registerReceiver(mBroadcastReceiverState, BTIntent);
+                    Objects.requireNonNull(getActivity()).registerReceiver(mBroadcastReceiverState, BTIntent);
                 }
             }
         }
@@ -204,14 +206,14 @@ public class BluetoothToggleFragment extends Fragment {
             startActivity(discoverableIntent);
 
             IntentFilter modeFilter = new IntentFilter(BluetoothAdapter.ACTION_SCAN_MODE_CHANGED);
-            getActivity().registerReceiver(mBroadcastReceiverMode, modeFilter);
+            Objects.requireNonNull(getActivity()).registerReceiver(mBroadcastReceiverMode, modeFilter);
         }
     };
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        getActivity().unregisterReceiver(mBroadcastReceiverState);
+        Objects.requireNonNull(getActivity()).unregisterReceiver(mBroadcastReceiverState);
         getActivity().unregisterReceiver(mBroadcastReceiverMode);
     }
 }

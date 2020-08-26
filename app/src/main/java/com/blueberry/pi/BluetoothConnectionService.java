@@ -16,10 +16,9 @@ import android.os.Build;
 import android.util.Log;
 
 public class BluetoothConnectionService {
+
     // Debugging
     private static final String TAG = "BluetoothReadService";
-    private static final boolean D = true;
-
 
     private static final UUID SerialPortServiceClass_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
 
@@ -44,7 +43,7 @@ public class BluetoothConnectionService {
     public static final int STATE_CONNECTED = 3;  // now connected to a remote device
 
     /**
-     * Constructor. Prepares a new BluetoothChat session.
+     * Constructor. Prepares a new  session.
      * @param context  The activity context
      */
     public BluetoothConnectionService(Context context) {
@@ -59,7 +58,6 @@ public class BluetoothConnectionService {
      * @param state  An integer defining the current connection state
      */
     private synchronized void setState(int state) {
-        if (D) Log.d(TAG, "setState() " + mState + " -> " + state);
         mState = state;
     }
 
@@ -73,7 +71,7 @@ public class BluetoothConnectionService {
      * Start the chat service. Specifically start AcceptThread to begin a
      * session in listening (server) mode. Called by the Activity onResume() */
     public synchronized void start() {
-        if (D) Log.d(TAG, "start");
+        System.out.println("start");
 
         // Cancel any thread attempting to make a connection
         if (mConnectThread != null) {
@@ -95,7 +93,7 @@ public class BluetoothConnectionService {
      * @param device  The BluetoothDevice to connect
      */
     public synchronized void connect(BluetoothDevice device) {
-        if (D) Log.d(TAG, "connect to: " + device);
+        System.out.println("connect to: " + device);
 
         // Cancel any thread attempting to make a connection
         if (mState == STATE_CONNECTING) {
@@ -112,12 +110,12 @@ public class BluetoothConnectionService {
     }
 
     /**
-     * Start the ConnectedThread to begin managing a Bluetooth connection
-     * @param socket  The BluetoothSocket on which the connection was made
-     * @param device  The BluetoothDevice that has been connected
+     * Start the ConnectedThread
+     * @param socket The BluetoothSocket on which the connection was made
+     * @param device The BluetoothDevice that has been connected
      */
     public synchronized void connected(BluetoothSocket socket, BluetoothDevice device) {
-        if (D) Log.d(TAG, "connected");
+        System.out.println("connected");
 
         // Cancel the thread that completed the connection
         if (mConnectThread != null) {
@@ -138,9 +136,6 @@ public class BluetoothConnectionService {
         setState(STATE_CONNECTED);
     }
 
-    /**
-     * Stop all threads
-     */
     public synchronized void stop() {
 
 
@@ -158,9 +153,8 @@ public class BluetoothConnectionService {
     }
 
     /**
-     * Write to the ConnectedThread in an unsynchronized manner
+     * Write to the ConnectedThread
      * @param out The bytes to write
-     * @see ConnectedThread#write(byte[])
      */
     public void write(byte[] out) {
         // Create temporary object
@@ -174,16 +168,10 @@ public class BluetoothConnectionService {
         r.write(out);
     }
 
-    /**
-     * Indicate that the connection attempt failed and notify the UI Activity.
-     */
     private void connectionFailed() {
         setState(STATE_NONE);
     }
 
-    /**
-     * Indicate that the connection was lost and notify the UI Activity.
-     */
     private void connectionLost() {
         setState(STATE_NONE);
     }
@@ -207,40 +195,33 @@ public class BluetoothConnectionService {
                 if ( mAllowInsecureConnections ) {
                     Method method;
 
-                    method = device.getClass().getMethod("createRfcommSocket", new Class[] { int.class } );
+                    method = device.getClass().getMethod("createRfcommSocket", int.class);
                     tmp = (BluetoothSocket) method.invoke(device, 1);
                 }
                 else {
                     tmp = device.createRfcommSocketToServiceRecord( SerialPortServiceClass_UUID );
                 }
             } catch (Exception e) {
-                Log.d(TAG, "create() failed", e);
+                System.out.println("unable to connect" + e);
             }
             mmSocket = tmp;
         }
 
         public void run() {
-            Log.d(TAG, "start mConnectThread");
+            System.out.println("start mConnectThread");
             setName("ConnectThread");
 
-            // Always cancel discovery because it will slow down a connection
             mAdapter.cancelDiscovery();
 
-            // Make a connection to the BluetoothSocket
             try {
-                // This is a blocking call and will only return on a
-                // successful connection or an exception
                 mmSocket.connect();
             } catch (IOException e) {
                 connectionFailed();
-                // Close the socket
                 try {
                     mmSocket.close();
                 } catch (IOException e2) {
                     System.out.println(e2);
                 }
-                // Start the service over to restart listening mode
-                //BluetoothSerialService.this.start();
                 return;
             }
 
@@ -257,7 +238,7 @@ public class BluetoothConnectionService {
             try {
                 mmSocket.close();
             } catch (IOException e) {
-                Log.e(TAG, "close() of connect socket failed", e);
+                System.out.println("Unable to disconnect" + e);
             }
         }
     }
@@ -273,7 +254,6 @@ public class BluetoothConnectionService {
 
 
         public ConnectedThread(BluetoothSocket socket) {
-            Log.d(TAG, "create ConnectedThread");
             mmSocket = socket;
             InputStream tmpIn = null;
             OutputStream tmpOut = null;
@@ -283,7 +263,7 @@ public class BluetoothConnectionService {
                 tmpIn = socket.getInputStream();
                 tmpOut = socket.getOutputStream();
             } catch (IOException e) {
-                Log.e(TAG, "temp sockets not created", e);
+                System.out.println(e);
             }
 
             mmInStream = tmpIn;
@@ -304,7 +284,7 @@ public class BluetoothConnectionService {
                     System.out.println(new String(subArray(buffer, 0, bytes - 1)));
 
                 } catch (IOException e) {
-                    Log.e(TAG, "disconnected", e);
+                    System.out.println("disconnected");
                     connectionLost();
                     break;
                 }
