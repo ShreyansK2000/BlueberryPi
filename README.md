@@ -20,30 +20,30 @@ is successfully able to do.
 
 ## Screenshots
 
-<div style="text-align:center; padding: 5%">
+<p style="text-align:center; padding: 5%">
     <img src="img/home-enable-discover.png" alt="home-enable-discover" width="40%"
         style="padding:20px; display:inline-block">
     <img src="img/discovered-devices.png" alt="discovered-devices" width="40%"
         style="padding:20px; display:inline-block">
-</div>
-<div style="text-align:center; padding: 5%">
+</p>
+<p style="text-align:center; padding: 5%">
     <img src="img/paired-devices.png" alt="paired-devices" width="40%" style="padding:20px; display:inline-block">
     <img src="img/rpi-connection-successful.png" alt="rpi-connection-successful" width="40%"
         style="padding:20px; display:inline-block">
-</div>
+</p>
 
 ## Raspberry Pi Output
 
 Sending a string after a successful connection will result in something like this:
 
-<div style="text-align:center; padding: 5%">
+<p style="text-align:center; padding: 5%">
     <img src="img/sending-a-string.png" alt="sending-a-string" width="40%" style="padding:20px; display:inline-block">
 
-</div>
-<div style="text-align:center; padding: 5%">
+</p>
+<p style="text-align:center; padding: 5%">
     <img src="img/python-output-blueberry-pi.png" alt="python-output-blueberry-pi" width="80%"
         style="padding:20px; display:inline-block">
-</div>
+</p>
 
 ## Acknowledgments
 
