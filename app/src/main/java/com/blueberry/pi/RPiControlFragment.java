@@ -1,4 +1,4 @@
-package com.cpen391m2.exercise5;
+package com.blueberry.pi;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -15,7 +15,6 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import java.nio.charset.Charset;
-import java.sql.Time;
 import java.util.UUID;
 
 public class RPiControlFragment extends Fragment {

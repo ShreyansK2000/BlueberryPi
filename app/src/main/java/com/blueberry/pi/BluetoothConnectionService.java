@@ -1,4 +1,4 @@
-package com.cpen391m2.exercise5;
+package com.blueberry.pi;
 
 import java.io.IOException;
 import java.io.InputStream;

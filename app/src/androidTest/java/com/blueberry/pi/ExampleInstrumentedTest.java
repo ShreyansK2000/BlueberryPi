@@ -1,4 +1,4 @@
-package com.cpen391m2.exercise5;
+package com.blueberry.pi;
 
 import android.content.Context;
 
@@ -22,6 +22,6 @@ public class ExampleInstrumentedTest {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
 
-        assertEquals("com.cpen391m2.exercise5", appContext.getPackageName());
+        assertEquals("com.blueberry.pi", appContext.getPackageName());
     }
 }

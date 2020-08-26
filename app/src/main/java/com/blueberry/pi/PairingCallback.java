@@ -1,4 +1,4 @@
-package com.cpen391m2.exercise5;
+package com.blueberry.pi;
 
 public interface PairingCallback {
     void pair_button_callback();

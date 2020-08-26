@@ -1,4 +1,4 @@
-package com.cpen391m2.exercise5;
+package com.blueberry.pi;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;

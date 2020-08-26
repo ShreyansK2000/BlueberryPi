@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Exercise5</string>
+    <string name="app_name">Blueberry Pi</string>
     <string name="menu_rpi">Raspberry Pi</string>
     <string name="menu_connect">Bluetooth</string>
     <string name="menu_devices">Devices</string>

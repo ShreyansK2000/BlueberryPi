@@ -1,4 +1,4 @@
-package com.cpen391m2.exercise5;
+package com.blueberry.pi;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
